@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS entries(
+  id BIGINT PRIMARY KEY,
+  title VARCHAR (300) UNIQUE NOT NULL,
+  url VARCHAR (300) UNIQUE NOT NULL,
+  site_domain VARCHAR (100) NOT NULL,
+  bookmark_count INT NOT NULL,
+  image VARCHAR (300),
+  published_at TIMESTAMP NOT NULL
+);

@@ -9,10 +9,10 @@ services:
     env_file: .env
     depends_on:
       - db
+    volumes:
+      - ./db:/opt/db
   db:
     image: postgres:13
     ports:
       - 5432:5432
-    environment:
-      POSTGRES_USER: pguser
-      POSTGRES_PASSWORD: pgpassword
+    env_file: .env
