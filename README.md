@@ -4,6 +4,9 @@
 
 ```sh
 heroku login
-go build
-git push heroku main
+git push heroku
+
+heroku container:login
+heroku container:push web
+heroku container:release web
 ```
