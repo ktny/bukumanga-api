@@ -14,6 +14,8 @@ RUN go build -o app
 # stage2 final
 FROM ubuntu:20.04
 
+WORKDIR /opt
+
 # golang-migrate
 # @see https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
 RUN apt-get update -y && apt-get upgrade -y &&\

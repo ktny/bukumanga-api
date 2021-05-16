@@ -6,7 +6,6 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file: .env
-    working_dir: /opt
     depends_on:
       - db
     volumes:
