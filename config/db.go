@@ -6,23 +6,29 @@ import (
 )
 
 var (
-	DBUser = os.Getenv("POSTGRES_USER")
-	DBPassword = os.Getenv("POSTGRES_PASSWORD")
-	DBName = os.Getenv("POSTGRES_DB")
-	DBHost = os.Getenv("POSTGRES_HOST")
-	DBPort = "5432"
-	DBType = "postgres"
+	env = os.Getenv("ENV")
+	dbUser = os.Getenv("POSTGRES_USER")
+	dbPassword = os.Getenv("POSTGRES_PASSWORD")
+	dbName = os.Getenv("POSTGRES_DB")
+	dbHost = os.Getenv("POSTGRES_HOST")
+	dbPort = "5432"
+	dbType = "postgres"
 )
 
 func GetDBType() string {
-	return DBType
+	return dbType
 }
 
 func GetPostgresConnectionString() string {
-	return fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
-		DBHost,
-		DBPort,
-		DBUser,
-		DBName,
-		DBPassword)
+	conString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
+		dbHost,
+		dbPort,
+		dbUser,
+		dbName,
+		dbPassword)
+	if env == "production" {
+		return conString
+	} else {
+		return conString + " sslmode=disable"
+	}
 }
