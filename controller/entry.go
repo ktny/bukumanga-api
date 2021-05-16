@@ -31,17 +31,24 @@ func Hello() echo.HandlerFunc {
 
 func GetEntries() echo.HandlerFunc {
     return func(c echo.Context) error {
-		rows, err := db.Query("select id, title from entries")
+		rows, err := db.Query("SELECT id, title, url, domain, bookmark_count, image, published_at FROM entries")
         if err != nil {
-			return errors.Wrapf(err, "connot connect SQL")
+			return errors.Wrapf(err, "connot get entries")
         }
         defer rows.Close()
 
 		entries := []model.Entry{}
         for rows.Next() {
 			entry := model.Entry{}
-            if err := rows.Scan(&entry.ID, &entry.Title); err != nil {
-				log.Fatalln("cannot connect SQL")
+            if err := rows.Scan(
+				&entry.ID,
+				&entry.Title,
+				&entry.URL,
+				&entry.Domain,
+				&entry.BookmarkCount,
+				&entry.Image,
+				&entry.PublishedAt); err != nil {
+				log.Fatalln(err)
             }
             entries = append(entries, entry)
         }
