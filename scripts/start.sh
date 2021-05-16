@@ -2,7 +2,7 @@
 set -euxo pipefail
 
 # wait for postgres
-until PGPASSWORD=${POSTGRES_PASSWORD} psql -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ${POSTGRES_DB} -c '\l'; do
+until PGPASSWORD=${POSTGRES_PASSWORD} psql -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ${POSTGRES_DB} -c '\dn'; do
   >&2 echo "Postgres is unavailable - sleeping"
   sleep 1
 done
