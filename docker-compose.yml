@@ -11,7 +11,7 @@ services:
       - db
     volumes:
       - ./db:/opt/db
-    command: ["./wait-for-postgres.sh", "db", "./start.sh"]
+    command: ["./start.sh"]
   db:
     image: postgres:12
     ports:

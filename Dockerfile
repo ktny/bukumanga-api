@@ -30,6 +30,6 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/
     apt-get update && apt-get install -y postgresql-client-12
 
 COPY --from=builder /go/bukumanga-api/app /opt/app
-COPY ./scripts/wait-for-postgres.sh ./scripts/start.sh /opt/
+COPY ./scripts/start.sh /opt/
 
 EXPOSE 5000
