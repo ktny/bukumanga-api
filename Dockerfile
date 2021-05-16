@@ -33,3 +33,5 @@ COPY --from=builder /go/bukumanga-api/app /opt/app
 COPY ./scripts/start.sh /opt/
 
 EXPOSE 5000
+
+CMD [ "./start.sh" ]
