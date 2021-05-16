@@ -14,11 +14,9 @@ RUN go build -o app
 # stage2 final
 FROM ubuntu:20.04
 
-WORKDIR /opt
-
 # golang-migrate
 # @see https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
-RUN apt-get update && apt-get upgrade -y &&\
+RUN apt-get update -y && apt-get upgrade -y &&\
     apt-get install -y curl gnupg2 vim &&\
     curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz &&\
     mv ./migrate.linux-amd64 /usr/bin/migrate

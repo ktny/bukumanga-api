@@ -1,16 +1,18 @@
 version: "3"
+
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - 5000:5000
     env_file: .env
+    working_dir: /opt
     depends_on:
       - db
     volumes:
       - ./db:/opt/db
+    ports:
+      - "5000:5000"
   db:
     image: postgres:12
     ports:
