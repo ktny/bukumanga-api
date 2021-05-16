@@ -1,4 +1,4 @@
-CREATE FUNCTION set_update_time() RETURNS OPAQUE AS '
+CREATE FUNCTION set_update_time() RETURNS TRIGGER AS '
   begin
     new.updated_at := ''now'';
     return new;
