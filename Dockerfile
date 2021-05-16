@@ -12,7 +12,7 @@ COPY . .
 RUN go build -o app
 
 # stage2 final
-FROM ubuntu
+FROM ubuntu:20.04
 
 WORKDIR /opt
 
@@ -23,9 +23,13 @@ RUN apt-get update && apt-get upgrade -y &&\
     curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz &&\
     mv ./migrate.linux-amd64 /usr/bin/migrate
 
+# postgresql-client
+# @see https://www.postgresql.org/download/linux/ubuntu/
+RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/apt/sources.list.d/pgdg.list &&\
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
+    apt-get update && apt-get install -y postgresql-client-12
+
 COPY --from=builder /go/bukumanga-api/app /opt/app
-COPY ./start.sh /opt/start.sh
+COPY ./scripts/wait-for-postgres.sh ./scripts/start.sh /opt/
 
 EXPOSE 5000
-
-CMD ["./start.sh"]
