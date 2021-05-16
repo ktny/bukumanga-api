@@ -1,1 +1,3 @@
+DROP FUNCTION IF EXISTS set_update_time;
 DROP TABLE IF EXISTS entries;
+DROP TRIGGER IF EXISTS update_tri;
