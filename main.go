@@ -1,10 +1,11 @@
 package main
 
 import (
-	"net/http"
+	"bukumanga-api/controller"
 	"os"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func port() string {
@@ -17,8 +18,15 @@ func port() string {
 
 func main() {
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello World")
-	})
+
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	// Routes
+	e.GET("/", controller.Hello())
+	e.GET("/entries", controller.GetEntries())
+
+	// Start server
 	e.Logger.Fatal(e.Start(port()))
 }
