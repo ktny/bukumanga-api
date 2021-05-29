@@ -31,7 +31,7 @@ func Hello() echo.HandlerFunc {
 
 func GetEntries() echo.HandlerFunc {
     return func(c echo.Context) error {
-		rows, err := db.Query("SELECT id, title, url, domain, bookmark_count, image, published_at FROM entries")
+		rows, err := db.Query("SELECT id, title, url, domain, bookmark_count, image, hotentried_at, published_at FROM entries")
         if err != nil {
 			return errors.Wrapf(err, "connot get entries")
         }
@@ -47,6 +47,7 @@ func GetEntries() echo.HandlerFunc {
 				&entry.Domain,
 				&entry.BookmarkCount,
 				&entry.Image,
+				&entry.HotentriedAt,
 				&entry.PublishedAt); err != nil {
 				log.Fatalln(err)
             }
