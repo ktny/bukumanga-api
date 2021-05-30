@@ -11,6 +11,4 @@ type Entry struct {
 	Image sql.NullString `json:"image"`
 	HotentriedAt string `json:"hotentried_at"`
 	PublishedAt string `json:"published_at"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
 }

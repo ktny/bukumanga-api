@@ -23,7 +23,7 @@ docker-compose logs -f
 docker-compose exec web bash
 
 # create migration
-migrate create -ext sql -dir db/migrations -seq create_entries_table
+migrate create -ext sql -dir db/migrations -seq {migration_name}
 
 # migrate
 migrate -database ${POSTGRESQL_URL} -path db/migrations up

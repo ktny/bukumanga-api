@@ -67,6 +67,8 @@ func GetEntries() echo.HandlerFunc {
 				&entry.PublishedAt); err != nil {
 				log.Fatalln(err)
             }
+			entry.HotentriedAt = entry.HotentriedAt[:10]
+			entry.PublishedAt = entry.PublishedAt[:10]
             entries = append(entries, entry)
         }
 
