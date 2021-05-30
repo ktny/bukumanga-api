@@ -11,6 +11,12 @@ docker-compose exec db bash
 psql -U pguser bukumanga
 ```
 
+#### Debug Log
+
+```sh
+docker-compose logs -f
+```
+
 #### Migration
 
 ```sh
