@@ -2,19 +2,16 @@ package util
 
 import "fmt"
 
-func ConvertDBOrder(order string) string {
+func MakeOrderByClause(order string) string {
 	// 1文字切り出しで取得されるのはbyteのためstringに変換
 	// マルチバイトの場合は[]runeにキャストしてから切り出す必要がある
 	symbol := string(order[0])
-	key := order[1:]
-	sort := "ASC"
 	switch symbol {
 	case "+":
-		sort = "ASC"
+		return fmt.Sprintf(" ORDER BY %s %s", order[1:], "ASC")
 	case "-":
-		sort = "DESC"
+		return fmt.Sprintf(" ORDER BY %s %s", order[1:], "DESC")
 	default:
-		key = order
+		return fmt.Sprintf(" ORDER BY %s %s", order, "ASC")
 	}
-	return fmt.Sprintf("%s %s", key, sort)
 }

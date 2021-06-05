@@ -5,7 +5,6 @@ import (
 	"bukumanga-api/model"
 	"bukumanga-api/util"
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -41,7 +40,7 @@ func GetEntries() echo.HandlerFunc {
 		endDate, _ := time.Parse(dateFmt, c.QueryParam("endDate"))
 		keyword := c.QueryParam("keyword")
 		bookmarkCount, _ := strconv.Atoi(c.QueryParam("bookmarkCount"))
-		order := util.ConvertDBOrder(c.QueryParam("order"))
+		orderByClause := util.MakeOrderByClause(c.QueryParam("order"))
 
 		query := `SELECT id, title, url, domain, bookmark_count, image, hotentried_at, published_at
 			FROM entries
@@ -49,7 +48,7 @@ func GetEntries() echo.HandlerFunc {
 				hotentried_at BETWEEN $1 AND $2 AND
 				(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
 				bookmark_count > $4`
-		query += fmt.Sprintf(" ORDER BY %s", order)
+		query += orderByClause
 
 		rows, err := db.Query(query, startDate, endDate, keyword, bookmarkCount)
         if err != nil {
