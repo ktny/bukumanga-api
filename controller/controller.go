@@ -3,6 +3,7 @@ package controller
 import (
 	"bukumanga-api/config"
 	"bukumanga-api/model"
+	"bukumanga-api/util"
 	"database/sql"
 	"log"
 	"net/http"
@@ -39,15 +40,17 @@ func GetEntries() echo.HandlerFunc {
 		endDate, _ := time.Parse(dateFmt, c.QueryParam("endDate"))
 		keyword := c.QueryParam("keyword")
 		bookmarkCount, _ := strconv.Atoi(c.QueryParam("bookmarkCount"))
+		order := util.ConvertDBOrder(c.QueryParam("order"))
 
 		query := `SELECT id, title, url, domain, bookmark_count, image, hotentried_at, published_at
 			FROM entries
 			WHERE
-				bookmark_count > $1 AND
-				hotentried_at BETWEEN $3 AND $4 AND
-				(title ILIKE '%' || $2 || '%' OR domain ILIKE '%' || $2 || '%')`
+				hotentried_at BETWEEN $1 AND $2 AND
+				(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
+				bookmark_count > $4
+			ORDER BY $5`
 
-		rows, err := db.Query(query, bookmarkCount, keyword, startDate, endDate)
+		rows, err := db.Query(query, startDate, endDate, keyword, bookmarkCount, order)
         if err != nil {
 			return errors.Wrapf(err, "connot get entries")
         }
@@ -67,6 +70,7 @@ func GetEntries() echo.HandlerFunc {
 				&entry.PublishedAt); err != nil {
 				log.Fatalln(err)
             }
+			// Date部分のみ切り出し
 			entry.HotentriedAt = entry.HotentriedAt[:10]
 			entry.PublishedAt = entry.PublishedAt[:10]
             entries = append(entries, entry)
