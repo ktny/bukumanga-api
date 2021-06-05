@@ -15,7 +15,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-const dateFmt string = "2006-01-02"
+const DATE_FMT string = "2006-01-02"
+const PER_PAGE int = 50
 var db *sql.DB
 
 func init() {
@@ -27,35 +28,42 @@ func init() {
 	}
 }
 
+// Hello ヘルスチェック
 func Hello() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello")
 	}
 }
 
+// GetEntries エントリ一覧を取得する
 func GetEntries() echo.HandlerFunc {
     return func(c echo.Context) error {
-
-		startDate, _ := time.Parse(dateFmt, c.QueryParam("startDate"))
-		endDate, _ := time.Parse(dateFmt, c.QueryParam("endDate"))
+		// クエリパラメータの取得
+		startDate, _ := time.Parse(DATE_FMT, c.QueryParam("startDate"))
+		endDate, _ := time.Parse(DATE_FMT, c.QueryParam("endDate"))
 		keyword := c.QueryParam("keyword")
 		bookmarkCount, _ := strconv.Atoi(c.QueryParam("bookmarkCount"))
-		orderByClause := util.MakeOrderByClause(c.QueryParam("order"))
+		order := c.QueryParam("order")
+		page, _ := strconv.Atoi(c.QueryParam("page"))
 
+		// SQLクエリの構築
 		query := `SELECT id, title, url, domain, bookmark_count, image, hotentried_at, published_at
 			FROM entries
 			WHERE
 				hotentried_at BETWEEN $1 AND $2 AND
 				(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
 				bookmark_count > $4`
-		query += orderByClause
+		query += util.MakeOrderByClause(order)
+		query += util.MakeLimitOffsetClause(page, PER_PAGE)
 
+		// クエリ実行
 		rows, err := db.Query(query, startDate, endDate, keyword, bookmarkCount)
         if err != nil {
 			return errors.Wrapf(err, "connot get entries")
         }
         defer rows.Close()
 
+		// クエリ実行結果をエントリ一覧に格納
 		entries := []model.Entry{}
         for rows.Next() {
 			entry := model.Entry{}

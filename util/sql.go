@@ -2,6 +2,7 @@ package util
 
 import "fmt"
 
+// MakeOrderByClause SQLクエリのOrderBy句を作成する
 func MakeOrderByClause(order string) string {
 	// 1文字切り出しで取得されるのはbyteのためstringに変換
 	// マルチバイトの場合は[]runeにキャストしてから切り出す必要がある
@@ -14,4 +15,9 @@ func MakeOrderByClause(order string) string {
 	default:
 		return fmt.Sprintf(" ORDER BY %s %s", order, "ASC")
 	}
+}
+
+// MakeLimitOffsetClause SQLクエリのLIMITとOFFSET句を作成する
+func MakeLimitOffsetClause(page int, perPage int) string {
+	return fmt.Sprintf(" LIMIT %d OFFSET %d", perPage, page)
 }
