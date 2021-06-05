@@ -5,6 +5,7 @@ import (
 	"bukumanga-api/model"
 	"bukumanga-api/util"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -47,10 +48,10 @@ func GetEntries() echo.HandlerFunc {
 			WHERE
 				hotentried_at BETWEEN $1 AND $2 AND
 				(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
-				bookmark_count > $4
-			ORDER BY $5`
+				bookmark_count > $4`
+		query += fmt.Sprintf(" ORDER BY %s", order)
 
-		rows, err := db.Query(query, startDate, endDate, keyword, bookmarkCount, order)
+		rows, err := db.Query(query, startDate, endDate, keyword, bookmarkCount)
         if err != nil {
 			return errors.Wrapf(err, "connot get entries")
         }
@@ -73,6 +74,8 @@ func GetEntries() echo.HandlerFunc {
 			// Date部分のみ切り出し
 			entry.HotentriedAt = entry.HotentriedAt[:10]
 			entry.PublishedAt = entry.PublishedAt[:10]
+
+			// fmt.Printf("%+v\n", entry)
             entries = append(entries, entry)
         }
 
