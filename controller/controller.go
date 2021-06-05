@@ -16,7 +16,7 @@ import (
 )
 
 const DATE_FMT string = "2006-01-02"
-const PER_PAGE int = 50
+const PER_PAGE int = 20
 var db *sql.DB
 
 func init() {

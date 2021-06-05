@@ -19,5 +19,5 @@ func MakeOrderByClause(order string) string {
 
 // MakeLimitOffsetClause SQLクエリのLIMITとOFFSET句を作成する
 func MakeLimitOffsetClause(page int, perPage int) string {
-	return fmt.Sprintf(" LIMIT %d OFFSET %d", perPage, page)
+	return fmt.Sprintf(" LIMIT %d OFFSET %d", perPage, page * perPage)
 }
