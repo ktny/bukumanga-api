@@ -16,7 +16,6 @@ import (
 )
 
 const DATE_FMT string = "2006-01-02"
-const PER_PAGE int = 20
 var db *sql.DB
 
 func init() {
@@ -45,6 +44,7 @@ func GetEntries() echo.HandlerFunc {
 		bookmarkCount, _ := strconv.Atoi(c.QueryParam("bookmarkCount"))
 		order := c.QueryParam("order")
 		page, _ := strconv.Atoi(c.QueryParam("page"))
+		perPage, _ := strconv.Atoi(c.QueryParam("perPage"))
 
 		// SQLクエリの構築
 		query := `SELECT id, title, url, domain, bookmark_count, image, hotentried_at, published_at
@@ -54,7 +54,7 @@ func GetEntries() echo.HandlerFunc {
 				(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
 				bookmark_count > $4`
 		query += util.MakeOrderByClause(order)
-		query += util.MakeLimitOffsetClause(page, PER_PAGE)
+		query += util.MakeLimitOffsetClause(page, perPage)
 
 		// クエリ実行
 		rows, err := db.Query(query, startDate, endDate, keyword, bookmarkCount)
