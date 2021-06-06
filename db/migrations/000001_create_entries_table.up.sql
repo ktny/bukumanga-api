@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS entries(
-  id BIGINT SERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   title VARCHAR (300) UNIQUE NOT NULL,
   url VARCHAR (300) UNIQUE NOT NULL,
   domain VARCHAR (100) NOT NULL,
-  bookmark_count INT NOT NULL,
+  bookmark_count SMALLINT NOT NULL,
   image VARCHAR (1000),
   hotentried_at DATE NOT NULL,
   published_at DATE NOT NULL,
