@@ -52,7 +52,7 @@ func GetEntries() echo.HandlerFunc {
 			WHERE
 				hotentried_at BETWEEN $1 AND $2 AND
 				(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
-				bookmark_count > $4`
+				bookmark_count >= $4`
 		query += util.MakeOrderByClause(order)
 		query += util.MakeLimitOffsetClause(page, perPage)
 
