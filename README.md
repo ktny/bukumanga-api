@@ -30,6 +30,9 @@ migrate -database ${POSTGRESQL_URL} -path db/migrations up
 
 # rollback
 migrate -database ${POSTGRESQL_URL} -path db/migrations down
+
+# fix dirty 
+migrate -database ${POSTGRESQL_URL} -path db/migrations force N
 ```
 
 ### Production
