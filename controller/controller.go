@@ -4,24 +4,24 @@ import (
 	"bukumanga-api/config"
 	"bukumanga-api/model"
 	"bukumanga-api/util"
-	"database/sql"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
 const DATE_FMT string = "2006-01-02"
-var db *sql.DB
+var db *sqlx.DB
 
 func init() {
 	var err error
 	conString := config.GetPostgresConnectionString()
-	db, err = sql.Open(config.GetDBType(), conString)
+	db, err = sqlx.Open(config.GetDBType(), conString)
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +47,7 @@ func GetEntries() echo.HandlerFunc {
 		perPage, _ := strconv.Atoi(c.QueryParam("perPage"))
 
 		// SQLクエリの構築
-		query := `SELECT id, title, url, domain, bookmark_count, image, hotentried_at, published_at
+		query := `SELECT *
 			FROM entries
 			WHERE
 				hotentried_at BETWEEN $1 AND $2 AND
@@ -57,7 +57,7 @@ func GetEntries() echo.HandlerFunc {
 		query += util.MakeLimitOffsetClause(page, perPage)
 
 		// クエリ実行
-		rows, err := db.Query(query, startDate, endDate, keyword, bookmarkCount)
+		rows, err := db.Queryx(query, startDate, endDate, keyword, bookmarkCount)
         if err != nil {
 			return errors.Wrapf(err, "connot get entries")
         }
@@ -67,17 +67,9 @@ func GetEntries() echo.HandlerFunc {
 		entries := []model.Entry{}
         for rows.Next() {
 			entry := model.Entry{}
-            if err := rows.Scan(
-				&entry.ID,
-				&entry.Title,
-				&entry.URL,
-				&entry.Domain,
-				&entry.BookmarkCount,
-				&entry.Image,
-				&entry.HotentriedAt,
-				&entry.PublishedAt); err != nil {
+			if err := rows.StructScan(&entry); err != nil {
 				log.Fatalln(err)
-            }
+			}
 			// Date部分のみ切り出し
 			entry.HotentriedAt = entry.HotentriedAt[:10]
 			entry.PublishedAt = entry.PublishedAt[:10]

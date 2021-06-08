@@ -4,6 +4,12 @@
 
 ### Develop
 
+#### Connect Web
+
+```sh
+docker-compose exec web bash
+```
+
 #### Connect DB
 
 ```sh
