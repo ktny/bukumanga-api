@@ -4,7 +4,6 @@ import (
 	"bukumanga-api/config"
 	"bukumanga-api/model"
 	"bukumanga-api/util"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,7 +11,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
 )
 
 const DATE_FMT string = "2006-01-02"
@@ -47,8 +45,7 @@ func GetEntries() echo.HandlerFunc {
 		perPage, _ := strconv.Atoi(c.QueryParam("perPage"))
 
 		// SQLクエリの構築
-		query := `SELECT *
-			FROM entries
+		query := `SELECT * FROM entries
 			WHERE
 				hotentried_at BETWEEN $1 AND $2 AND
 				(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
@@ -56,27 +53,14 @@ func GetEntries() echo.HandlerFunc {
 		query += util.MakeOrderByClause(order)
 		query += util.MakeLimitOffsetClause(page, perPage)
 
-		// クエリ実行
-		rows, err := db.Queryx(query, startDate, endDate, keyword, bookmarkCount)
-        if err != nil {
-			return errors.Wrapf(err, "connot get entries")
-        }
-        defer rows.Close()
-
-		// クエリ実行結果をエントリ一覧に格納
-		entries := []model.Entry{}
-        for rows.Next() {
-			entry := model.Entry{}
-			if err := rows.StructScan(&entry); err != nil {
-				log.Fatalln(err)
-			}
-			// Date部分のみ切り出し
-			entry.HotentriedAt = entry.HotentriedAt[:10]
-			entry.PublishedAt = entry.PublishedAt[:10]
-
-			// fmt.Printf("%+v\n", entry)
-            entries = append(entries, entry)
-        }
+		// クエリ実行結果を構造体に格納
+		var entries []model.Entry
+		db.Select(&entries, query, startDate, endDate, keyword, bookmarkCount)
+		for i, entry := range entries {
+			var comments []model.Comment
+			db.Select(&comments, `SELECT * FROM comments WHERE entry_id = $1`, entry.ID)
+			entries[i].Comments = comments
+		}
 
         return c.JSON(http.StatusOK, entries)
     }
