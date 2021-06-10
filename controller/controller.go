@@ -54,10 +54,10 @@ func GetEntries() echo.HandlerFunc {
 		query += util.MakeLimitOffsetClause(page, perPage)
 
 		// クエリ実行結果を構造体に格納
-		var entries []model.Entry
+		entries := []model.Entry{}
 		db.Select(&entries, query, startDate, endDate, keyword, bookmarkCount)
 		for i, entry := range entries {
-			var comments []model.Comment
+			comments := []model.Comment{}
 			db.Select(&comments, `SELECT * FROM comments WHERE entry_id = $1`, entry.ID)
 			entries[i].Comments = comments
 		}
