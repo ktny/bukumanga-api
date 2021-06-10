@@ -30,3 +30,8 @@ type Comment struct {
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
+
+type Response struct {
+	Count int `db:"count" json:"count"`
+	Entries []Entry `db:"entries" json:"entries"`
+}

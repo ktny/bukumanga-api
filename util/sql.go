@@ -2,6 +2,14 @@ package util
 
 import "fmt"
 
+// MakeWhereClause SQLクエリのWhere句を作成する
+func MakeWhereClause() string {
+	return ` WHERE
+		hotentried_at BETWEEN $1 AND $2 AND
+		(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
+		bookmark_count >= $4`
+}
+
 // MakeOrderByClause SQLクエリのOrderBy句を作成する
 func MakeOrderByClause(order string) string {
 	// 1文字切り出しで取得されるのはbyteのためstringに変換

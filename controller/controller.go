@@ -45,15 +45,17 @@ func GetEntries() echo.HandlerFunc {
 		perPage, _ := strconv.Atoi(c.QueryParam("perPage"))
 
 		// SQLクエリの構築
-		query := `SELECT * FROM entries
-			WHERE
-				hotentried_at BETWEEN $1 AND $2 AND
-				(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
-				bookmark_count >= $4`
-		query += util.MakeOrderByClause(order)
-		query += util.MakeLimitOffsetClause(page, perPage)
+		query := `SELECT * FROM entries`
+		whereClause := util.MakeWhereClause()
+
+		// 総カウント数を取得
+		var count int
+		db.Get(&count, `SELECT COUNT(*) FROM entries` + whereClause, startDate, endDate, keyword, bookmarkCount)
 
 		// クエリ実行結果を構造体に格納
+		query += whereClause
+		query += util.MakeOrderByClause(order)
+		query += util.MakeLimitOffsetClause(page, perPage)
 		entries := []model.Entry{}
 		db.Select(&entries, query, startDate, endDate, keyword, bookmarkCount)
 		for i, entry := range entries {
@@ -62,6 +64,9 @@ func GetEntries() echo.HandlerFunc {
 			entries[i].Comments = comments
 		}
 
-        return c.JSON(http.StatusOK, entries)
+		// レスポンスを作成
+		response := model.Response{Count: count, Entries: entries}
+
+        return c.JSON(http.StatusOK, response)
     }
 }
