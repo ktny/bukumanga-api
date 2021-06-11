@@ -5,7 +5,7 @@ import "fmt"
 // MakeWhereClause SQLクエリのWhere句を作成する
 func MakeWhereClause() string {
 	return ` WHERE
-		hotentried_at BETWEEN $1 AND $2 AND
+		((hotentried_at BETWEEN $1 AND $2) OR (published_at BETWEEN $1 AND $2)) AND
 		(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
 		bookmark_count >= $4`
 }
