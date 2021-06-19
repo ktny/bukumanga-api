@@ -53,7 +53,7 @@ heroku run bash
 #### Debug Log
 
 ```sh
-heroku logs -t 
+heroku logs -t
 ```
 
 #### Connect DB
