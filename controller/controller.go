@@ -58,11 +58,11 @@ func GetEntries() echo.HandlerFunc {
 		query += util.MakeLimitOffsetClause(page, perPage)
 		entries := []model.Entry{}
 		db.Select(&entries, query, startDate, endDate, keyword, bookmarkCount)
-		for i, entry := range entries {
-			comments := []model.Comment{}
-			db.Select(&comments, `SELECT * FROM comments WHERE entry_id = $1`, entry.ID)
-			entries[i].Comments = comments
-		}
+		// for i, entry := range entries {
+		// 	comments := []model.Comment{}
+		// 	db.Select(&comments, `SELECT * FROM comments WHERE entry_id = $1`, entry.ID)
+		// 	entries[i].Comments = comments
+		// }
 
 		// レスポンスを作成
 		response := model.Response{Count: count, Entries: entries}
