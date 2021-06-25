@@ -1,13 +1,26 @@
 package util
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // MakeWhereClause SQLクエリのWhere句を作成する
 func MakeWhereClause() string {
 	return ` WHERE
-		((hotentried_at BETWEEN $1 AND $2) OR (published_at BETWEEN $1 AND $2)) AND
-		(title ILIKE '%' || $3 || '%' OR domain ILIKE '%' || $3 || '%') AND
-		bookmark_count BETWEEN $4 AND $5`
+	((hotentried_at BETWEEN $1 AND $2) OR (published_at BETWEEN $1 AND $2)) AND
+	bookmark_count BETWEEN $3 AND $4`
+}
+
+// MakeWhereKeywordClause SQLクエリのキーワードのWhere句を作成する
+func MakeWhereKeywordClause(keywords []string) string {
+	slice := make([]string, len(keywords))
+	for i, keyword := range keywords {
+		q := fmt.Sprintf("(title ILIKE '%%%s%%' OR domain ILIKE '%%%s%%')", keyword, keyword)
+		slice[i] = q
+	}
+
+	return strings.Join(slice, " AND ")
 }
 
 // MakeOrderByClause SQLクエリのOrderBy句を作成する
