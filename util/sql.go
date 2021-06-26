@@ -30,11 +30,11 @@ func MakeOrderByClause(order string) string {
 	symbol := string(order[0])
 	switch symbol {
 	case "+":
-		return fmt.Sprintf(" ORDER BY %s %s", order[1:], "ASC")
+		return fmt.Sprintf(" ORDER BY %s %s, id DESC", order[1:], "ASC")
 	case "-":
-		return fmt.Sprintf(" ORDER BY %s %s", order[1:], "DESC")
+		return fmt.Sprintf(" ORDER BY %s %s, id DESC", order[1:], "DESC")
 	default:
-		return fmt.Sprintf(" ORDER BY %s %s", order, "ASC")
+		return fmt.Sprintf(" ORDER BY %s %s, id DESC", order, "ASC")
 	}
 }
 
