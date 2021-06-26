@@ -40,24 +40,3 @@ migrate -database ${POSTGRESQL_URL} -path db/migrations down
 # fix dirty 
 migrate -database ${POSTGRESQL_URL} -path db/migrations force N
 ```
-
-### Production
-
-#### SSH App
-
-```sh
-heroku git:remote --app bukumanga-api
-heroku run bash
-```
-
-#### Debug Log
-
-```sh
-heroku logs -t
-```
-
-#### Connect DB
-
-```sh
-heroku pg:psql postgresql-sinuous-85818 --app bukumanga-api
-```
