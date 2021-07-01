@@ -8,8 +8,9 @@ import (
 // MakeWhereClause SQLクエリのWhere句を作成する
 func MakeWhereClause() string {
 	return ` WHERE
-	((hotentried_at BETWEEN $1 AND $2) OR (published_at BETWEEN $1 AND $2)) AND
-	bookmark_count BETWEEN $3 AND $4`
+	published_at BETWEEN $1 AND $2 AND
+	bookmark_count BETWEEN $3 AND $4 AND
+	publisher_ids IN $5`
 }
 
 // MakeWhereKeywordClause SQLクエリのキーワードのWhere句を作成する

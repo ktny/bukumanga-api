@@ -39,10 +39,16 @@ func Hello() echo.HandlerFunc {
 func GetEntries() echo.HandlerFunc {
     return func(c echo.Context) error {
 		// クエリパラメータの取得
+		queryParams := c.QueryParams()
 		startDate, _ := time.Parse(DATE_FMT, c.QueryParam("startDate"))
 		endDate, _ := time.Parse(DATE_FMT, c.QueryParam("endDate"))
 		bookmarkCount, _ := strconv.Atoi(c.QueryParam("bookmarkCount"))
 		bookmarkCountMax, _ := strconv.Atoi(c.QueryParam("bookmarkCountMax"))
+		publisherIds := queryParams["publisherIds"]
+
+		fmt.Println(queryParams)
+		fmt.Println(queryParams["publisherIds"])
+
 		order := c.QueryParam("order")
 		page, _ := strconv.Atoi(c.QueryParam("page"))
 		perPage, _ := strconv.Atoi(c.QueryParam("perPage"))
@@ -66,14 +72,14 @@ func GetEntries() echo.HandlerFunc {
 
 		// 総カウント数を取得
 		var count int
-		db.Get(&count, `SELECT COUNT(*) FROM entries` + whereClause, startDate, endDate, bookmarkCount, bookmarkCountMax)
+		db.Get(&count, `SELECT COUNT(*) FROM entries` + whereClause, startDate, endDate, bookmarkCount, bookmarkCountMax, publisherIds)
 
 		// クエリ実行結果を構造体に格納
 		query += whereClause
 		query += util.MakeOrderByClause(order)
 		query += util.MakeLimitOffsetClause(page, perPage)
 		entries := []model.Entry{}
-		db.Select(&entries, query, startDate, endDate, bookmarkCount, bookmarkCountMax)
+		db.Select(&entries, query, startDate, endDate, bookmarkCount, bookmarkCountMax, publisherIds)
 		for i, entry := range entries {
 			comments := []model.Comment{}
 			db.Select(&comments, `SELECT * FROM comments WHERE entry_id = $1 ORDER BY rank LIMIT 10`, entry.ID)
@@ -87,48 +93,15 @@ func GetEntries() echo.HandlerFunc {
     }
 }
 
-// GetSites サイト一覧を取得する
-func GetSites() echo.HandlerFunc {
+// GetPublishers サイト一覧を取得する
+func GetPublishers() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// クエリパラメータの取得
-		startDate, _ := time.Parse(DATE_FMT, c.QueryParam("startDate"))
-		endDate, _ := time.Parse(DATE_FMT, c.QueryParam("endDate"))
-		bookmarkCount, _ := strconv.Atoi(c.QueryParam("bookmarkCount"))
-		bookmarkCountMax, _ := strconv.Atoi(c.QueryParam("bookmarkCountMax"))
-		order := c.QueryParam("order")
-		page, _ := strconv.Atoi(c.QueryParam("page"))
-		perPage, _ := strconv.Atoi(c.QueryParam("perPage"))
-
-		// キーワードの分割
-		rep := regexp.MustCompile(`\s+`)
-		keyword := strings.TrimSpace(c.QueryParam("keyword"))
-		keyword = rep.ReplaceAllString(keyword, " ")
-		var keywords []string
-		if keyword != "" {
-			keywords = strings.Split(keyword, " ")
-		}
-
-		// SQLクエリの構築
-		query := `SELECT * FROM entries`
-		whereClause := util.MakeWhereClause()
-
-		if len(keywords) > 0 {
-			whereClause += fmt.Sprintf(" AND (%s)", util.MakeWhereKeywordClause(keywords))
-		}
-
-		// 総カウント数を取得
-		var count int
-		db.Get(&count, `SELECT COUNT(*) FROM entries` + whereClause, startDate, endDate, bookmarkCount, bookmarkCountMax)
-
 		// クエリ実行結果を構造体に格納
-		query += whereClause
-		query += util.MakeOrderByClause(order)
-		query += util.MakeLimitOffsetClause(page, perPage)
-		entries := []model.Entry{}
-		db.Select(&entries, query, startDate, endDate, bookmarkCount, bookmarkCountMax)
+		publishers := []model.Publisher{}
+		db.Select(&publishers, `SELECT * FROM Publishers`)
 
 		// レスポンスを作成
-		response := model.Response{Count: count, Entries: entries}
+		response := model.PublishersResponse{Publishers: publishers}
 
         return c.JSON(http.StatusOK, response)
     }

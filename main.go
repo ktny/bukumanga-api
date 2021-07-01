@@ -27,7 +27,7 @@ func main() {
 	// Routes
 	e.GET("/", controller.Hello())
 	e.GET("/entries", controller.GetEntries())
-	e.GET("/sites", controller.GetSites())
+	e.GET("/publishers", controller.GetPublishers())
 
 	// Start server
 	e.Logger.Fatal(e.Start(port()))

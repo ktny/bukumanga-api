@@ -45,5 +45,5 @@ migrate -database ${POSTGRESQL_URL} -path db/migrations force N
 
 ```sh
 docker-compose exec web bash
-psql -h db -U pguser bukumanga -f ./db/seeds/sites.sql
+psql -h db -U pguser bukumanga -f ./db/seeds/publishers.sql
 ```

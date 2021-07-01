@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS comments(
   id SERIAL PRIMARY KEY,
-  entry_id INT NOT NULL REFERENCES entries (id),
+  entry_id INT NOT NULL REFERENCES entries (id) ON DELETE CASCADE,
   rank SMALLINT NOT NULL CHECK (rank > 0),
   username VARCHAR (100) NOT NULL,
   icon VARCHAR (100) NOT NULL,
