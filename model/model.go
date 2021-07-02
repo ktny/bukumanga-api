@@ -12,7 +12,7 @@ type Entry struct {
 	Domain string `db:"domain" json:"domain"`
 	BookmarkCount int16 `db:"bookmark_count" json:"bookmark_count"`
 	Image sql.NullString `db:"image" json:"image"`
-	PublsiherID sql.NullString `db:"publsiher_id" json:"publsiher_id"`
+	PublisherID int32 `db:"publisher_id" json:"publisher_id"`
 	HotentriedAt time.Time `db:"hotentried_at" json:"hotentried_at"`
 	PublishedAt time.Time `db:"published_at" json:"published_at"`
 	Comments []Comment `db:"comments" json:"comments"`

@@ -6,17 +6,14 @@ import (
 	"bukumanga-api/util"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 )
 
-const DATE_FMT string = "2006-01-02"
 var db *sqlx.DB
 
 func init() {
@@ -40,57 +37,104 @@ func GetEntries() echo.HandlerFunc {
     return func(c echo.Context) error {
 		// クエリパラメータの取得
 		queryParams := c.QueryParams()
-		startDate, _ := time.Parse(DATE_FMT, c.QueryParam("startDate"))
-		endDate, _ := time.Parse(DATE_FMT, c.QueryParam("endDate"))
-		bookmarkCount, _ := strconv.Atoi(c.QueryParam("bookmarkCount"))
-		bookmarkCountMax, _ := strconv.Atoi(c.QueryParam("bookmarkCountMax"))
-		publisherIds := queryParams["publisherIds"]
-
-		fmt.Println(queryParams)
-		fmt.Println(queryParams["publisherIds"])
-
 		order := c.QueryParam("order")
 		page, _ := strconv.Atoi(c.QueryParam("page"))
 		perPage, _ := strconv.Atoi(c.QueryParam("perPage"))
 
-		// キーワードの分割
-		rep := regexp.MustCompile(`\s+`)
-		keyword := strings.TrimSpace(c.QueryParam("keyword"))
-		keyword = rep.ReplaceAllString(keyword, " ")
-		var keywords []string
-		if keyword != "" {
-			keywords = strings.Split(keyword, " ")
+		query := `SELECT * FROM entries
+					WHERE
+						published_at BETWEEN :startDate AND :endDate AND
+						bookmark_count BETWEEN :bookmarkCount AND :bookmarkCountMax`
+
+		input := map[string]interface{}{
+			"startDate": queryParams["startDate"],
+			"endDate": queryParams["endDate"],
+			"bookmarkCount": queryParams["bookmarkCount"],
+			"bookmarkCountMax": queryParams["bookmarkCountMax"],
 		}
 
-		// SQLクエリの構築
-		query := `SELECT * FROM entries`
-		whereClause := util.MakeWhereClause()
+		// ドメイン指定があればフィルターできるようにする
+		if len(queryParams["publisherIds"]) > 0 {
+			query += ` AND publisher_id IN (:publisherIds)`
+			input["publisherIds"] = queryParams["publisherIds"]
+		}
 
+		// 値をバインド
+		query, args, err := sqlx.Named(query, input)
+		if err != nil {
+			panic(err)
+		}
+
+		// WHERE IN対応
+		query, args, err = sqlx.In(query, args...)
+		if err != nil {
+			panic(err)
+		}
+		query = db.Rebind(query)
+
+		// キーワードの分割
+		keywords := util.TrimSplit(c.QueryParam("keyword"))
 		if len(keywords) > 0 {
-			whereClause += fmt.Sprintf(" AND (%s)", util.MakeWhereKeywordClause(keywords))
+			query += fmt.Sprintf(" AND (%s)", util.MakeWhereKeywordClause(keywords))
 		}
 
 		// 総カウント数を取得
 		var count int
-		db.Get(&count, `SELECT COUNT(*) FROM entries` + whereClause, startDate, endDate, bookmarkCount, bookmarkCountMax, publisherIds)
+		err = db.Get(&count, strings.Replace(query, "*", "COUNT(*)", 1), args...)
+		if err != nil {
+			panic(err)
+		}
 
 		// クエリ実行結果を構造体に格納
-		query += whereClause
 		query += util.MakeOrderByClause(order)
 		query += util.MakeLimitOffsetClause(page, perPage)
 		entries := []model.Entry{}
-		db.Select(&entries, query, startDate, endDate, bookmarkCount, bookmarkCountMax, publisherIds)
-		for i, entry := range entries {
-			comments := []model.Comment{}
-			db.Select(&comments, `SELECT * FROM comments WHERE entry_id = $1 ORDER BY rank LIMIT 10`, entry.ID)
-			entries[i].Comments = comments
+		err = db.Select(&entries, query, args...)
+		if err != nil {
+			panic(err)
 		}
+
+		// エントリIDリストを取得
+		var entryIds []int32;
+		for _, entry := range entries {
+			entryIds = append(entryIds, entry.ID)
+		}
+
+		// 各エントリにコメントとドメイン情報を追加
+		commentMap := getCommentMap(entryIds)
+		for i, entry := range entries {
+			entries[i].Comments = commentMap[entry.ID]
+		}
+
+		// fmt.Println(entries)
 
 		// レスポンスを作成
 		response := model.Response{Count: count, Entries: entries}
 
         return c.JSON(http.StatusOK, response)
     }
+}
+
+// getCommentMap EntryごとのCommentを取得する
+func getCommentMap(entryIds []int32) map[int32][]model.Comment {
+	query, args, err := sqlx.In(`SELECT * FROM comments WHERE entry_id IN (?) AND rank <= 10 ORDER BY rank`, entryIds)
+	if err != nil {
+		panic(err)
+	}
+	query = db.Rebind(query)
+
+	comments := []model.Comment{}
+	err = db.Select(&comments, query, args...)
+	if err != nil {
+		panic(err)
+	}
+
+	var commentMap = make(map[int32][]model.Comment, 10)
+	for _, comment := range comments {
+		commentMap[comment.EntryID] = append(commentMap[comment.EntryID], comment)
+	}
+
+	return commentMap
 }
 
 // GetPublishers サイト一覧を取得する

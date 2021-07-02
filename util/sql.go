@@ -5,19 +5,11 @@ import (
 	"strings"
 )
 
-// MakeWhereClause SQLクエリのWhere句を作成する
-func MakeWhereClause() string {
-	return ` WHERE
-	published_at BETWEEN $1 AND $2 AND
-	bookmark_count BETWEEN $3 AND $4 AND
-	publisher_ids IN $5`
-}
-
 // MakeWhereKeywordClause SQLクエリのキーワードのWhere句を作成する
 func MakeWhereKeywordClause(keywords []string) string {
 	slice := make([]string, len(keywords))
 	for i, keyword := range keywords {
-		q := fmt.Sprintf("(title ILIKE '%%%s%%' OR domain ILIKE '%%%s%%')", keyword, keyword)
+		q := fmt.Sprintf("title ILIKE '%%%s%%'", keyword)
 		slice[i] = q
 	}
 
@@ -25,6 +17,8 @@ func MakeWhereKeywordClause(keywords []string) string {
 }
 
 // MakeOrderByClause SQLクエリのOrderBy句を作成する
+// -bookmark_count -> ORDER BY boomark_count DESC, id DESC
+// +bookmark_count -> ORDER BY boomark_count ASC, id DESC
 func MakeOrderByClause(order string) string {
 	// 1文字切り出しで取得されるのはbyteのためstringに変換
 	// マルチバイトの場合は[]runeにキャストしてから切り出す必要がある
