@@ -76,7 +76,7 @@ func GetEntries() echo.HandlerFunc {
 		db.Select(&entries, query, startDate, endDate, bookmarkCount, bookmarkCountMax)
 		for i, entry := range entries {
 			comments := []model.Comment{}
-			db.Select(&comments, `SELECT * FROM comments WHERE entry_id = $1`, entry.ID)
+			db.Select(&comments, `SELECT * FROM comments WHERE entry_id = $1 ORDER BY rank`, entry.ID)
 			entries[i].Comments = comments
 		}
 
