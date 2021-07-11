@@ -159,16 +159,12 @@ func getPublisherMap() map[int32]model.Publisher {
 	return publisherMap
 }
 
-// GetPublishers サイト一覧を取得する
+// GetPublishers 配信サイト一覧を取得する
 func GetPublishers() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// クエリ実行結果を構造体に格納
 		publishers := []model.Publisher{}
-		db.Select(&publishers, `SELECT * FROM Publishers`)
-
-		// レスポンスを作成
+		db.Select(&publishers, `SELECT id, domain, name FROM Publishers`)
 		response := model.PublishersResponse{Publishers: publishers}
-
         return c.JSON(http.StatusOK, response)
     }
 }
