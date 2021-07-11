@@ -11,3 +11,5 @@ CREATE INDEX ON publishers (name);
 
 -- TODO: 外部キー追加。データなし状態ではできないので後追いで行う
 ALTER TABLE entries ADD COLUMN IF NOT EXISTS publisher_id INT NOT NULL DEFAULT 0;
+
+CREATE INDEX ON entries (publisher_id);
