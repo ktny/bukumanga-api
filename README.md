@@ -32,11 +32,18 @@ docker-compose exec web bash
 migrate create -ext sql -dir db/migrations -seq {migration_name}
 
 # migrate
-migrate -database ${POSTGRESQL_URL} -path db/migrations up
+migrate -database ${POSTGRESQL_URL} -path db/migrations up N
 
 # rollback
-migrate -database ${POSTGRESQL_URL} -path db/migrations down
+migrate -database ${POSTGRESQL_URL} -path db/migrations down N
 
 # fix dirty 
 migrate -database ${POSTGRESQL_URL} -path db/migrations force N
+```
+
+#### Seed
+
+```sh
+docker-compose exec web bash
+psql -h db -U pguser bukumanga -f ./db/seeds/publishers.sql
 ```

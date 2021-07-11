@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS publishers;
+ALTER TABLE entries DROP COLUMN IF EXISTS publisher_id;

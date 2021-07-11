@@ -12,9 +12,11 @@ type Entry struct {
 	Domain string `db:"domain" json:"domain"`
 	BookmarkCount int16 `db:"bookmark_count" json:"bookmark_count"`
 	Image sql.NullString `db:"image" json:"image"`
+	PublisherID int32 `db:"publisher_id" json:"publisher_id"`
 	HotentriedAt time.Time `db:"hotentried_at" json:"hotentried_at"`
 	PublishedAt time.Time `db:"published_at" json:"published_at"`
 	Comments []Comment `db:"comments" json:"comments"`
+	Publisher Publisher `db:"publisher" json:"publisher"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
@@ -31,7 +33,20 @@ type Comment struct {
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
+type Publisher struct {
+	ID int32 `db:"id" json:"id"`
+	Domain string `db:"domain" json:"domain"`
+	Name string `db:"name" json:"name"`
+	// Icon string `db:"icon" json:"icon"`
+	// CreatedAt time.Time `db:"created_at" json:"created_at"`
+	// UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+}
+
 type Response struct {
 	Count int `db:"count" json:"count"`
 	Entries []Entry `db:"entries" json:"entries"`
+}
+
+type PublishersResponse struct {
+	Publishers []Publisher `db:"publishers" json:"publishers"`
 }
