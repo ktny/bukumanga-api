@@ -146,7 +146,7 @@ func getCommentMap(entryIds []int32) map[int32][]model.Comment {
 // getPublisherMap publisherのマップを取得する
 func getPublisherMap() map[int32]model.Publisher {
 	publishers := []model.Publisher{}
-	err := db.Select(&publishers, `SELECT id, domain, name FROM publishers`)
+	err := db.Select(&publishers, `SELECT id, domain, name FROM publishers ORDER BY id`)
 	if err != nil {
 		panic(err)
 	}
