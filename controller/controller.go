@@ -15,6 +15,7 @@ import (
 )
 
 var db *sqlx.DB
+var publisherMap map[int32]model.Publisher
 
 func init() {
 	var err error
@@ -23,6 +24,8 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+
+	publisherMap = getPublisherMap()
 }
 
 // Hello ヘルスチェック
@@ -104,9 +107,8 @@ func GetEntries() echo.HandlerFunc {
 		commentMap := getCommentMap(entryIds)
 		for i, entry := range entries {
 			entries[i].Comments = commentMap[entry.ID]
+			entries[i].Publisher = publisherMap[entry.PublisherID]
 		}
-
-		// fmt.Println(entries)
 
 		// レスポンスを作成
 		response := model.Response{Count: count, Entries: entries}
@@ -117,6 +119,10 @@ func GetEntries() echo.HandlerFunc {
 
 // getCommentMap EntryごとのCommentを取得する
 func getCommentMap(entryIds []int32) map[int32][]model.Comment {
+	if len(entryIds) == 0 {
+		return nil
+	}
+
 	query, args, err := sqlx.In(`SELECT * FROM comments WHERE entry_id IN (?) AND rank <= 10 ORDER BY rank`, entryIds)
 	if err != nil {
 		panic(err)
@@ -135,6 +141,22 @@ func getCommentMap(entryIds []int32) map[int32][]model.Comment {
 	}
 
 	return commentMap
+}
+
+// getPublisherMap publisherのマップを取得する
+func getPublisherMap() map[int32]model.Publisher {
+	publishers := []model.Publisher{}
+	err := db.Select(&publishers, `SELECT id, domain, name FROM publishers`)
+	if err != nil {
+		panic(err)
+	}
+
+	var publisherMap = make(map[int32]model.Publisher)
+	for _, publisher := range publishers {
+		publisherMap[publisher.ID] = publisher
+	}
+
+	return publisherMap
 }
 
 // GetPublishers サイト一覧を取得する
