@@ -163,7 +163,7 @@ func getPublisherMap() map[int32]model.Publisher {
 func GetPublishers() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		publishers := []model.Publisher{}
-		db.Select(&publishers, `SELECT id, domain, name FROM Publishers`)
+		db.Select(&publishers, `SELECT id, domain, name FROM publishers ORDER BY id`)
 		response := model.PublishersResponse{Publishers: publishers}
         return c.JSON(http.StatusOK, response)
     }
