@@ -15,7 +15,6 @@ import (
 )
 
 var db *sqlx.DB
-var publisherMap map[int32]model.Publisher
 
 func init() {
 	var err error
@@ -24,8 +23,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-
-	publisherMap = getPublisherMap()
 }
 
 // Hello ヘルスチェック
@@ -104,6 +101,7 @@ func GetEntries() echo.HandlerFunc {
 		}
 
 		// 各エントリにコメントとドメイン情報を追加
+		publisherMap := getPublisherMap()
 		commentMap := getCommentMap(entryIds)
 		for i, entry := range entries {
 			entries[i].Comments = commentMap[entry.ID]
