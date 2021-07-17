@@ -1,0 +1,1 @@
+ALTER TABLE entries DROP COLUMN IF EXISTS is_trend;

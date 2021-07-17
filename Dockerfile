@@ -35,4 +35,4 @@ COPY ./scripts/start.sh /opt/
 
 EXPOSE 5000
 
-CMD [ "./start.sh" ]
+ENTRYPOINT [ "./start.sh" ]
