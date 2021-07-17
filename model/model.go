@@ -17,6 +17,7 @@ type Entry struct {
 	PublishedAt time.Time `db:"published_at" json:"published_at"`
 	Comments []Comment `db:"comments" json:"comments"`
 	Publisher Publisher `db:"publisher" json:"publisher"`
+	IsTrend bool `db:"is_trend" json:"is_trend"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }

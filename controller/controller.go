@@ -37,6 +37,7 @@ func GetEntries() echo.HandlerFunc {
     return func(c echo.Context) error {
 		// クエリパラメータの取得
 		queryParams := c.QueryParams()
+		isTrend, _ := strconv.ParseBool(c.QueryParam("isTrend"))
 		order := c.QueryParam("order")
 		page, _ := strconv.Atoi(c.QueryParam("page"))
 		perPage, _ := strconv.Atoi(c.QueryParam("perPage"))
@@ -57,6 +58,11 @@ func GetEntries() echo.HandlerFunc {
 		if len(queryParams["publisherIds"]) > 0 {
 			query += ` AND publisher_id IN (:publisherIds)`
 			input["publisherIds"] = queryParams["publisherIds"]
+		}
+
+		// トレンド指定があればフィルターできるようにする
+		if isTrend {
+			query += ` OR is_trend = TRUE`
 		}
 
 		// 値をバインド
