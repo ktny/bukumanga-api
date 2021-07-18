@@ -60,11 +60,6 @@ func GetEntries() echo.HandlerFunc {
 			input["publisherIds"] = queryParams["publisherIds"]
 		}
 
-		// トレンド指定があればフィルターできるようにする
-		if isTrend {
-			query += ` OR is_trend = TRUE`
-		}
-
 		// 値をバインド
 		query, args, err := sqlx.Named(query, input)
 		if err != nil {
@@ -82,6 +77,11 @@ func GetEntries() echo.HandlerFunc {
 		keywords := util.TrimSplit(c.QueryParam("keyword"))
 		if len(keywords) > 0 {
 			query += fmt.Sprintf(" AND (%s)", util.MakeWhereKeywordClause(keywords))
+		}
+
+		// トレンド指定があればフィルターできるようにする
+		if isTrend {
+			query += ` OR is_trend = TRUE`
 		}
 
 		// 総カウント数を取得
