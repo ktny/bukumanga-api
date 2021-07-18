@@ -80,8 +80,10 @@ func GetEntries() echo.HandlerFunc {
 		}
 
 		// トレンド指定があればフィルターできるようにする
-		if isTrend {
-			query += ` OR is_trend = TRUE`
+		if len(keywords) == 0 && c.QueryParam("bookmarkCount") == "0" && len(queryParams["publisherIds"]) == 0 {
+			if isTrend {
+				query += ` OR is_trend = TRUE`
+			}
 		}
 
 		// 総カウント数を取得
