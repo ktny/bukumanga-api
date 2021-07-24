@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS comments(
   commented_at DATE NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE (entry_id, rank)
+  UNIQUE (entry_id, rank),
+  UNIQUE (entry_id, username)
 );
